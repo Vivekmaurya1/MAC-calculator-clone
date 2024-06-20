@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/css/main.076d9419.css",
+    "main.js": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/js/main.8c186564.js",
+    "static/js/453.83bdee10.chunk.js": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/js/453.83bdee10.chunk.js",
+    "index.html": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/index.html",
+    "main.076d9419.css.map": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/css/main.076d9419.css.map",
+    "main.8c186564.js.map": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/js/main.8c186564.js.map",
+    "453.83bdee10.chunk.js.map": "/https//Vivekmaurya1.github.io/MAC-calculator-clone/static/js/453.83bdee10.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.076d9419.css",
+    "static/js/main.8c186564.js"
+  ]
+}
