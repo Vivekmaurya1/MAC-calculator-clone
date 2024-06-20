@@ -11,8 +11,8 @@ const Calculator = () => {
 
   // Function to handle button clicks
   const handleButtonClick = (label) => {
-    if (["+", "-", "*", "/"].includes(label)) {
-      handleOperatorClick(label); // Call handleOperatorClick for basic operators
+    if (["+", "-", "*", "÷"].includes(label)) { // Include "÷" in the check for basic operators
+      handleOperatorClick(label);
       return;
     }
 
@@ -57,29 +57,38 @@ const Calculator = () => {
     }
   };
 
-  // Function to handle basic operator clicks (+, -, *, /)
+  // Function to handle basic operator clicks (+, -, *, ÷)
   const handleOperatorClick = (nextOperator) => {
     const currentInput = parseFloat(displayValue);
 
-    if (operator && isWaitingForSecondOperand) {
-      // If an operator is already set and waiting for the second operand, update the operator
-      setOperator(nextOperator);
-      return;
-    }
+    switch (nextOperator) {
+      case "+":
+      case "-":
+      case "*":
+        if (operator && isWaitingForSecondOperand) {
+          setOperator(nextOperator);
+          return;
+        }
 
-    if (firstOperand === null) {
-      // Set the first operand if it's not already set
-      setFirstOperand(currentInput);
-    } else if (operator) {
-      // If both operands and operator are set, perform the calculation
-      const result = performCalculation(operator, firstOperand, currentInput);
-      setDisplayValue(result.toString());
-      setFirstOperand(result);
-    }
+        if (firstOperand === null) {
+          setFirstOperand(currentInput);
+        } else if (operator) {
+          const result = performCalculation(operator, firstOperand, currentInput);
+          setDisplayValue(result.toString());
+          setFirstOperand(result);
+        }
 
-    // Update operator and set state for waiting for the second operand
-    setOperator(nextOperator);
-    setIsWaitingForSecondOperand(true);
+        setOperator(nextOperator);
+        setIsWaitingForSecondOperand(true);
+        break;
+
+      case "÷": // Handle division
+        handleDivideClick();
+        break;
+
+      default:
+        break;
+    }
   };
 
   // Function to handle the "=" button click for calculation
@@ -103,7 +112,7 @@ const Calculator = () => {
         return num1 - num2;
       case "*":
         return num1 * num2;
-      case "/":
+      case "÷":
         return num1 / num2;
       default:
         return num2;
@@ -218,9 +227,34 @@ const Calculator = () => {
     }
   };
 
+  // Function to handle the division click
+  const handleDivideClick = () => {
+    const currentInput = parseFloat(displayValue);
+
+    if (operator && isWaitingForSecondOperand) {
+      // If an operator is already set and waiting for the second operand, update the operator
+      setOperator("÷");
+      return;
+    }
+
+    if (firstOperand === null) {
+      // Set the first operand if it's not already set
+      setFirstOperand(currentInput);
+    } else if (operator) {
+      // If both operands and operator are set, perform the calculation
+      const result = performCalculation(operator, firstOperand, currentInput);
+      setDisplayValue(result.toString());
+      setFirstOperand(result);
+    }
+
+    // Update operator and set state for waiting for the second operand
+    setOperator("÷");
+    setIsWaitingForSecondOperand(true);
+  };
+
   // List of buttons with labels
   const buttons = [
-    '(', ')', 'mc', 'm+', 'm-', 'mr', 'C', '+/-', '%', '/',
+    '(', ')', 'mc', 'm+', 'm-', 'mr', 'C', '+/-', '%', '÷', // Changed '/' to '÷'
     '2nd', 'x^2', 'x^3', 'x^y', 'e^x', '10^x', '7', '8', '9', '*',
     '1/x', '2√x', '3√x', 'y√x', 'ln', 'log10', '4', '5', '6', '-',
     'x!', 'sin', 'cos', 'tan', 'e', 'EE', '1', '2', '3', '+',
