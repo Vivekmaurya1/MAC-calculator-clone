@@ -9,151 +9,132 @@ const Calculator = () => {
   const [firstOperand, setFirstOperand] = useState(null);
   const [isWaitingForSecondOperand, setIsWaitingForSecondOperand] = useState(false);
 
+  // Function to handle button clicks
   const handleButtonClick = (label) => {
-    if (["+", "-", "*", "/", "sin", "cos", "tan", "sinh", "cosh", "tanh", "ln", "log10", "x^2", "x^3", "x^y", "e^x", "10^x", "2√x", "3√x", "y√x", "π"].includes(label)) {
-      handleSpecialFunctionClick(label);
+    if (["+", "-", "*", "/"].includes(label)) {
+      handleOperatorClick(label); // Call handleOperatorClick for basic operators
       return;
     }
 
     switch (label) {
       case "C":
-        setDisplayValue("0");
-        setOperator(null);
-        setFirstOperand(null);
-        setIsWaitingForSecondOperand(false);
+        clearDisplay();
         break;
       case "=":
-        if (operator && firstOperand !== null) {
-          const secondOperand = parseFloat(displayValue);
-          const result = performCalculation(operator, firstOperand, secondOperand);
-          setDisplayValue(result.toString());
-          setFirstOperand(result);
-          setOperator(null);
-          setIsWaitingForSecondOperand(false);
-        }
+        handleEqualClick();
         break;
       case "+/-":
-        setDisplayValue((prev) =>
-          prev.charAt(0) === "-" ? prev.slice(1) : `-${prev}`
-        );
+        toggleSign();
         break;
       case ".":
-        if (!displayValue.includes(".")) {
-          setDisplayValue(displayValue + ".");
-        }
+        appendDecimal();
         break;
       case "x!":
         handleFactorial();
         break;
-      default:
-        if (isWaitingForSecondOperand) {
-          setDisplayValue(label);
-          setIsWaitingForSecondOperand(false);
-        } else {
-          setDisplayValue((prev) => (prev === "0" ? label : prev + label));
-        }
-    }
-  };
-
-  const handleSpecialFunctionClick = (label) => {
-    const currentInput = parseFloat(displayValue);
-
-    switch (label) {
       case "sin":
-        setDisplayValue(Math.sin(currentInput).toString());
-        break;
       case "cos":
-        setDisplayValue(Math.cos(currentInput).toString());
-        break;
       case "tan":
-        setDisplayValue(Math.tan(currentInput).toString());
-        break;
       case "sinh":
-        setDisplayValue(Math.sinh(currentInput).toString());
-        break;
       case "cosh":
-        setDisplayValue(Math.cosh(currentInput).toString());
-        break;
       case "tanh":
-        setDisplayValue(Math.tanh(currentInput).toString());
-        break;
       case "ln":
-        setDisplayValue(Math.log(currentInput).toString());
-        break;
       case "log10":
-        setDisplayValue(Math.log10(currentInput).toString());
-        break;
       case "x^2":
-        setDisplayValue(Math.pow(currentInput, 2).toString());
-        break;
       case "x^3":
-        setDisplayValue(Math.pow(currentInput, 3).toString());
-        break;
       case "x^y":
-        break;
       case "e^x":
-        setDisplayValue(Math.exp(currentInput).toString());
-        break;
       case "10^x":
-        setDisplayValue(Math.pow(10, currentInput).toString());
-        break;
       case "2√x":
-        setDisplayValue(Math.sqrt(currentInput).toString());
-        break;
       case "3√x":
-        setDisplayValue(Math.cbrt(currentInput).toString());
-        break;
       case "y√x":
-        break;
       case "π":
-        setDisplayValue(Math.PI.toString());
+        handleSpecialFunctionClick(label);
         break;
       default:
+        appendDigitOrSymbol(label);
         break;
     }
-
-    setIsWaitingForSecondOperand(true); 
   };
 
+  // Function to handle basic operator clicks (+, -, *, /)
   const handleOperatorClick = (nextOperator) => {
     const currentInput = parseFloat(displayValue);
 
     if (operator && isWaitingForSecondOperand) {
+      // If an operator is already set and waiting for the second operand, update the operator
       setOperator(nextOperator);
       return;
     }
 
     if (firstOperand === null) {
+      // Set the first operand if it's not already set
       setFirstOperand(currentInput);
     } else if (operator) {
+      // If both operands and operator are set, perform the calculation
       const result = performCalculation(operator, firstOperand, currentInput);
       setDisplayValue(result.toString());
       setFirstOperand(result);
     }
 
-    setIsWaitingForSecondOperand(true);
+    // Update operator and set state for waiting for the second operand
     setOperator(nextOperator);
+    setIsWaitingForSecondOperand(true);
   };
 
-  const performCalculation = (operator, firstOperand, secondOperand) => {
-    switch (operator) {
-      case "+":
-        return firstOperand + secondOperand;
-      case "-":
-        return firstOperand - secondOperand;
-      case "*":
-        return firstOperand * secondOperand;
-      case "/":
-        return firstOperand / secondOperand;
-      default:
-        return secondOperand;
+  // Function to handle the "=" button click for calculation
+  const handleEqualClick = () => {
+    if (operator && firstOperand !== null) {
+      const secondOperand = parseFloat(displayValue);
+      const result = performCalculation(operator, firstOperand, secondOperand);
+      setDisplayValue(result.toString());
+      setFirstOperand(result);
+      setOperator(null);
+      setIsWaitingForSecondOperand(false);
     }
   };
 
+  // Function to perform arithmetic calculations
+  const performCalculation = (op, num1, num2) => {
+    switch (op) {
+      case "+":
+        return num1 + num2;
+      case "-":
+        return num1 - num2;
+      case "*":
+        return num1 * num2;
+      case "/":
+        return num1 / num2;
+      default:
+        return num2;
+    }
+  };
+
+  // Function to clear the display and reset state
+  const clearDisplay = () => {
+    setDisplayValue("0");
+    setOperator(null);
+    setFirstOperand(null);
+    setIsWaitingForSecondOperand(false);
+  };
+
+  // Function to toggle the sign (+/-) of the current input
+  const toggleSign = () => {
+    setDisplayValue((prev) => (prev.charAt(0) === "-" ? prev.slice(1) : `-${prev}`));
+  };
+
+  // Function to append a decimal point to the current input
+  const appendDecimal = () => {
+    if (!displayValue.includes(".")) {
+      setDisplayValue(displayValue + ".");
+    }
+  };
+
+  // Function to handle factorial calculation
   const handleFactorial = () => {
     const number = parseFloat(displayValue);
     if (number < 0) {
-      setDisplayValue("Error"); 
+      setDisplayValue("Error");
       return;
     }
     let result = 1;
@@ -164,45 +145,105 @@ const Calculator = () => {
     setIsWaitingForSecondOperand(true);
   };
 
+  // Function to handle special functions (sin, cos, tan, sinh, cosh, tanh, etc.)
+  const handleSpecialFunctionClick = (label) => {
+    const currentInput = parseFloat(displayValue);
+
+    switch (label) {
+      case "sin":
+        setDisplayValue(Math.sin((currentInput * Math.PI) / 180).toFixed(8)); // Calculate sine in degrees
+        break;
+      case "cos":
+        setDisplayValue(Math.cos((currentInput * Math.PI) / 180).toFixed(8)); // Calculate cosine in degrees
+        break;
+      case "tan":
+        setDisplayValue(Math.tan((currentInput * Math.PI) / 180).toFixed(8)); // Calculate tangent in degrees
+        break;
+      case "sinh":
+        setDisplayValue(Math.sinh(currentInput).toString()); // Calculate hyperbolic sine
+        break;
+      case "cosh":
+        setDisplayValue(Math.cosh(currentInput).toString()); // Calculate hyperbolic cosine
+        break;
+      case "tanh":
+        setDisplayValue(Math.tanh(currentInput).toString()); // Calculate hyperbolic tangent
+        break;
+      case "ln":
+        setDisplayValue(Math.log(currentInput).toString()); // Natural logarithm
+        break;
+      case "log10":
+        setDisplayValue(Math.log10(currentInput).toString()); // Base 10 logarithm
+        break;
+      case "x^2":
+        setDisplayValue(Math.pow(currentInput, 2).toString()); // Square
+        break;
+      case "x^3":
+        setDisplayValue(Math.pow(currentInput, 3).toString()); // Cube
+        break;
+      case "x^y":
+        // Handle power of y function if needed
+        break;
+      case "e^x":
+        setDisplayValue(Math.exp(currentInput).toString()); // Exponential function
+        break;
+      case "10^x":
+        setDisplayValue(Math.pow(10, currentInput).toString()); // 10 to the power of x
+        break;
+      case "2√x":
+        setDisplayValue(Math.sqrt(currentInput).toString()); // Square root
+        break;
+      case "3√x":
+        setDisplayValue(Math.cbrt(currentInput).toString()); // Cube root
+        break;
+      case "y√x":
+        // Handle nth root function if needed
+        break;
+      case "π":
+        setDisplayValue(Math.PI.toString()); // Pi value
+        break;
+      default:
+        break;
+    }
+
+    setIsWaitingForSecondOperand(true); // Set waiting for the second operand
+  };
+
+  // Function to append digits or symbols to the current display value
+  const appendDigitOrSymbol = (label) => {
+    if (isWaitingForSecondOperand) {
+      setDisplayValue(label);
+      setIsWaitingForSecondOperand(false);
+    } else {
+      setDisplayValue((prev) => (prev === "0" ? label : prev + label));
+    }
+  };
+
+  // List of buttons with labels
   const buttons = [
     '(', ')', 'mc', 'm+', 'm-', 'mr', 'C', '+/-', '%', '/',
     '2nd', 'x^2', 'x^3', 'x^y', 'e^x', '10^x', '7', '8', '9', '*',
     '1/x', '2√x', '3√x', 'y√x', 'ln', 'log10', '4', '5', '6', '-',
-    'x!', 'sin', 'cos', 'tan','e', 'EE', '1', '2', '3', '+',
+    'x!', 'sin', 'cos', 'tan', 'e', 'EE', '1', '2', '3', '+',
     'Rad', 'sinh', 'cosh', 'tanh', 'π', 'Rand', '0', '.', '='
   ];
 
-  function getTheClassName(label) {
-    let className = "";
-  
-    if (["+", "-", "*", "/"].includes(label)) {
-      className += "operator yellow";
-    }
-  
+  // Function to determine button classes based on label
+  const getButtonClassName = (label) => {
     switch (label) {
       case "C":
-        className += "clear"; 
-        break;
+        return "clear";
       case "+/-":
-        className += "plus-minus";
-        break;
+        return "plus-minus";
       case "0":
-        className += "zero number";
-        break;
+        return "zero number";
       case "Rad":
-        className += "rad-btm-lgt";
-        break;
+        return "rad-btm-lgt";
       case "=":
-        className += "eql-btm-rgt yellow operator";
-        break;
+        return "eql-btm-rgt yellow operator";
       default:
-        if (!isNaN(label) || label === ".") {
-          className += "number";
-        }
-        break;
+        return !isNaN(label) || label === "." ? "number" : "";
     }
-    return className;
-  }
+  };
 
   return (
     <div className="calculator">
@@ -217,8 +258,8 @@ const Calculator = () => {
           <Button
             key={index}
             label={label}
-            className={getTheClassName(label)}
-            onClick={handleButtonClick}
+            className={getButtonClassName(label)}
+            onClick={() => handleButtonClick(label)}
           />
         ))}
       </div>
